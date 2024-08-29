@@ -1,4 +1,4 @@
-module github.com/ipfs/go-ipld-format
+module github.com/Mo-RIZK/go-ipld-format
 
 require (
 	github.com/ipfs/go-block-format v0.1.2
