@@ -4,9 +4,7 @@ import (
 	"context"
 	"errors"
 )
-//babyyyyyy
-//DONEEEEEEEEEEE
-//To confirm
+//Erasure coding reedsolomon is included in here 
 // Walker provides methods to move through a DAG of nodes that implement
 // the `NavigableNode` interface. It uses iterative algorithms (instead
 // of recursive ones) that expose the `path` of nodes from the root to
@@ -243,6 +241,61 @@ func (w *Walker) Iterate(visitor Visitor) error {
 	}
 }
 
+func (w *Walker) ECIterate(visitor Visitor) error {
+
+	// Iterate until either: the end of the DAG (`errUpOnRoot`), a `Pause`
+	// is requested (`errPauseWalkOperation`) or an error happens (while
+	// going down).
+	for {
+
+		// First, go down as much as possible.
+		for {
+			err := w.ECdown(visitor)
+
+			if err == ErrDownNoChild {
+				break
+				// Can't keep going down from this node, try to move Next.
+			}
+
+			if err == errPauseWalkOperation {
+				return nil
+				// Pause requested, `errPauseWalkOperation` is just an internal
+				// error to signal to pause, don't pass it along.
+			}
+
+			if err != nil {
+				return err
+				// `down` is the only movement that can return *any* error.
+			}
+		}
+
+		// Can't move down anymore, turn to the next child in the `ActiveNode`
+		// to go down a different path. If there are no more child nodes
+		// available, go back up.
+		for {
+			err := w.NextChild()
+			if err == nil {
+				break
+				// No error, it turned to the next child. Try to go down again.
+			}
+
+			// It can't go Next (`ErrNextNoChild`), try to move up.
+			err = w.up()
+			if err != nil {
+				// Can't move up, on the root again (`errUpOnRoot`).
+				return EndOfDag
+			}
+
+			// Moved up, try `NextChild` again.
+		}
+
+		// Turned to the next child (after potentially many up moves),
+		// try going down again.
+	}
+}
+
+
+
 // Seek a specific node in a downwards manner. The `Visitor` should be
 // used to steer the seek selecting at each node which child will the
 // seek continue to (extending the `path` in that direction) or pause it
@@ -313,6 +366,20 @@ func (w *Walker) down(visitor Visitor) error {
 	return w.visitActiveNode(visitor)
 }
 
+func (w *Walker) ECdown(visitor Visitor) error {
+	
+	if w.ActiveNode().GetIPLDNode().Links()[0].Size > 262180{
+		child, err := w.fetchChild()
+		if err != nil {
+			return err
+		}
+		w.extendPath(child)
+		return nil 
+	}else{
+		w.visitActiveNode(visitor)
+		return ErrDownNoChild
+	}
+}
 // Fetch the child from the `ActiveNode` through the `FetchChild`
 // method of the `NavigableNode` interface.
 func (w *Walker) fetchChild() (NavigableNode, error) {
@@ -426,6 +493,7 @@ func (w *Walker) incrementActiveChildIndex() {
 // ActiveChildIndex returns the index of the child the `ActiveNode()`
 // is pointing to.
 func (w *Walker) ActiveChildIndex() uint {
+	//lets go
 	return w.childIndex[w.currentDepth]
 }
 
