@@ -6,6 +6,7 @@ import (
 )
 //babyyyyyy
 //DONEEEEEEEEEEE
+//To confirm
 // Walker provides methods to move through a DAG of nodes that implement
 // the `NavigableNode` interface. It uses iterative algorithms (instead
 // of recursive ones) that expose the `path` of nodes from the root to
