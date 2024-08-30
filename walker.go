@@ -367,7 +367,11 @@ func (w *Walker) down(visitor Visitor) error {
 }
 
 func (w *Walker) ECdown(visitor Visitor) error {
-	
+
+	if w.currentDepth == -1 {
+		// First time `down()` is called, `currentDepth` is -1
+		w.extendPath(w.path[0])
+	}
 	if w.ActiveNode().GetIPLDNode().Links()[0].Size > 262180{
 		child, err := w.fetchChild()
 		if err != nil {
