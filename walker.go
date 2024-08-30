@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 )
-//Erasure coding reedsolomon is included in here 
+
 // Walker provides methods to move through a DAG of nodes that implement
 // the `NavigableNode` interface. It uses iterative algorithms (instead
 // of recursive ones) that expose the `path` of nodes from the root to
@@ -273,18 +273,18 @@ func (w *Walker) ECIterate(visitor Visitor) error {
 		// to go down a different path. If there are no more child nodes
 		// available, go back up.
 		for {
-			err := w.NextChild()
+			err := w.up()
+			if err != nil {
+				// Can't move up, on the root again (`errUpOnRoot`).
+				return EndOfDag
+			}
+			err = w.NextChild()
 			if err == nil {
 				break
 				// No error, it turned to the next child. Try to go down again.
 			}
 
 			// It can't go Next (`ErrNextNoChild`), try to move up.
-			err = w.up()
-			if err != nil {
-				// Can't move up, on the root again (`errUpOnRoot`).
-				return EndOfDag
-			}
 
 			// Moved up, try `NextChild` again.
 		}
@@ -293,8 +293,6 @@ func (w *Walker) ECIterate(visitor Visitor) error {
 		// try going down again.
 	}
 }
-
-
 
 // Seek a specific node in a downwards manner. The `Visitor` should be
 // used to steer the seek selecting at each node which child will the
@@ -369,21 +367,26 @@ func (w *Walker) down(visitor Visitor) error {
 func (w *Walker) ECdown(visitor Visitor) error {
 
 	if w.currentDepth == -1 {
-		// First time `down()` is called, `currentDepth` is -1
+		// First time `down()` is called, `currentDepth` is -1,
+		// return the root node. Don't check available child nodes
+		// (as the `Walker` is not actually on any node just yet
+		// and `ActiveChildIndex` is of no use yet).
 		w.extendPath(w.path[0])
 	}
-	if w.ActiveNode().GetIPLDNode().Links()[0].Size > 262180{
+
+	if w.ActiveNode().GetIPLDNode().Links()[0].Size > 262180 {
 		child, err := w.fetchChild()
 		if err != nil {
 			return err
 		}
 		w.extendPath(child)
-		return nil 
-	}else{
+		return nil
+	} else {
 		w.visitActiveNode(visitor)
 		return ErrDownNoChild
 	}
 }
+
 // Fetch the child from the `ActiveNode` through the `FetchChild`
 // method of the `NavigableNode` interface.
 func (w *Walker) fetchChild() (NavigableNode, error) {
