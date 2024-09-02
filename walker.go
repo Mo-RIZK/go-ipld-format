@@ -241,7 +241,7 @@ func (w *Walker) Iterate(visitor Visitor) error {
 	}
 }
 
-func (w *Walker) ECIterate(visitor Visitor) error {
+func (w *Walker) ECIterate(visitor Visitor,chunksize uint64) error {
 
 	// Iterate until either: the end of the DAG (`errUpOnRoot`), a `Pause`
 	// is requested (`errPauseWalkOperation`) or an error happens (while
@@ -250,7 +250,7 @@ func (w *Walker) ECIterate(visitor Visitor) error {
 
 		// First, go down as much as possible.
 		for {
-			err := w.ECdown(visitor)
+			err := w.ECdown(visitor,chunksize)
 
 			if err == ErrDownNoChild {
 				break
@@ -364,7 +364,7 @@ func (w *Walker) down(visitor Visitor) error {
 	return w.visitActiveNode(visitor)
 }
 
-func (w *Walker) ECdown(visitor Visitor) error {
+func (w *Walker) ECdown(visitor Visitor,chunksize uint64) error {
 
 	if w.currentDepth == -1 {
 		// First time `down()` is called, `currentDepth` is -1,
@@ -374,7 +374,7 @@ func (w *Walker) ECdown(visitor Visitor) error {
 		w.extendPath(w.path[0])
 	}
 
-	if w.ActiveNode().GetIPLDNode().Links()[0].Size > 262180 {
+	if w.ActiveNode().GetIPLDNode().Links()[0].Size > chunksize*2 {
 		child, err := w.fetchChild()
 		if err != nil {
 			return err
