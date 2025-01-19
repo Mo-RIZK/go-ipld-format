@@ -3,6 +3,8 @@ package format
 import (
 	"context"
 	"fmt"
+	"os"
+	"time"
 
 	blocks "github.com/ipfs/go-block-format"
 
@@ -73,15 +75,21 @@ func (ns NodeStat) String() string {
 
 // MakeLink creates a link to the given node
 func MakeLink(n Node) (*Link, error) {
+	st := time.Now()
 	s, err := n.Size()
 	if err != nil {
 		return nil, err
 	}
-
-	return &Link{
+	en := time.Since(st)
+	fmt.Fprintf(os.Stdout, "GGGGGGGGGGGHHHHHHHHHHHHHHHHHHHHHH : %s \n", en.String())
+	st = time.Now()
+	l := &Link{
 		Size: s,
 		Cid:  n.Cid(),
-	}, nil
+	}
+	en = time.Since(st)
+	fmt.Fprintf(os.Stdout, "GGGGGGGGGGGHHHHHHHHHHHHHHHHHHHHHH2222222222222222222222222 : %s \n", en.String())
+	return l,nil
 }
 
 // GetNode returns the MDAG Node that this link points to
