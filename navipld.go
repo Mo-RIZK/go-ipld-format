@@ -82,7 +82,7 @@ func (nn *NavigableIPLDNode) FetchChild(ctx context.Context, childIndex uint) (N
 // Number of nodes to preload every time a child is requested.
 // TODO: Give more visibility to this constant, it could be an attribute
 // set in the `Walker` context that gets passed in `FetchChild`.
-const preloadSize = 10
+const preloadSize = 6
 
 // Preload at most `preloadSize` child nodes from `beg` through promises
 // created using this `ctx`.
