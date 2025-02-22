@@ -2,6 +2,9 @@ package format
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"time"
 
 	cid "github.com/ipfs/go-cid"
 )
@@ -82,7 +85,7 @@ func (nn *NavigableIPLDNode) FetchChild(ctx context.Context, childIndex uint) (N
 // Number of nodes to preload every time a child is requested.
 // TODO: Give more visibility to this constant, it could be an attribute
 // set in the `Walker` context that gets passed in `FetchChild`.
-const preloadSize = 2
+const preloadSize = 10
 
 // Preload at most `preloadSize` child nodes from `beg` through promises
 // created using this `ctx`.
@@ -102,7 +105,9 @@ func (nn *NavigableIPLDNode) preload(ctx context.Context, beg uint) {
 // TODO: Include `preload` into the beginning of this function?
 // (And collapse the two calls in `FetchChild`).
 func (nn *NavigableIPLDNode) getPromiseValue(ctx context.Context, childIndex uint) (Node, error) {
+	fmt.Fprintf(os.Stdout, "Date start download of this chunkkkkkkkkk : %s \n", time.Now().Format("2006-01-02 15:04:05.000"))
 	value, err := nn.childPromises[childIndex].Get(ctx)
+	fmt.Fprintf(os.Stdout, "Date end download of thissssss chunkkkkkkk : %s \n", time.Now().Format("2006-01-02 15:04:05.000"))
 	nn.childPromises[childIndex] = nil
 	return value, err
 }
