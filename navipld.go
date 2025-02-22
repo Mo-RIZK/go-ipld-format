@@ -49,6 +49,7 @@ func (nn *NavigableIPLDNode) FetchChild(ctx context.Context, childIndex uint) (N
 	// the `Walker` responsibility.
 
 	// If we drop to <= preloadSize/2 preloading nodes, preload the next 10.
+	fmt.Fprintf(os.Stdout, "Before preloading : %s \n", time.Now().Format("2006-01-02 15:04:05.000"))
 	for i := childIndex; i < childIndex+preloadSize/2 && i < uint(len(nn.childPromises)); i++ {
 		// TODO: Check if canceled.
 		if nn.childPromises[i] == nil {
@@ -56,8 +57,11 @@ func (nn *NavigableIPLDNode) FetchChild(ctx context.Context, childIndex uint) (N
 			break
 		}
 	}
+	fmt.Fprintf(os.Stdout, "After preloading : %s \n", time.Now().Format("2006-01-02 15:04:05.000"))
 
+	fmt.Fprintf(os.Stdout, "After preloading is launched and before getting the needed chunk : %s \n", time.Now().Format("2006-01-02 15:04:05.000"))
 	child, err := nn.getPromiseValue(ctx, childIndex)
+	fmt.Fprintf(os.Stdout, "After preloading is launched and afterrr getting the needed chunk : %s \n", time.Now().Format("2006-01-02 15:04:05.000"))
 
 	switch err {
 	case nil:
