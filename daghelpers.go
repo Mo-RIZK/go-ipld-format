@@ -2,6 +2,9 @@ package format
 
 import (
 	"context"
+	"os"
+	"fmt"
+	"time"
 
 	cid "github.com/ipfs/go-cid"
 )
@@ -78,6 +81,7 @@ func GetNodes(ctx context.Context, ds NodeGetter, keys []cid.Cid) []*NodePromise
 				for i, lnk_c := range keys {
 					if c.Equals(lnk_c) {
 						count++
+						fmt.Fprintf(os.Stdout, "preloadedddddd chunk of cid : %s : %s \n",lnk_c.String(), time.Now().Format("2006-01-02 15:04:05.000"))
 						promises[i].Send(nd)
 					}
 				}
