@@ -105,9 +105,8 @@ func (nn *NavigableIPLDNode) preload(ctx context.Context, beg uint) {
 // TODO: Include `preload` into the beginning of this function?
 // (And collapse the two calls in `FetchChild`).
 func (nn *NavigableIPLDNode) getPromiseValue(ctx context.Context, childIndex uint) (Node, error) {
-	fmt.Fprintf(os.Stdout, "Date start download of this chunkkkkkkkkk : %s \n", time.Now().Format("2006-01-02 15:04:05.000"))
+	fmt.Fprintf(os.Stdout, "Date start download of this chunkkkkkkk : %s \n", time.Now().Format("2006-01-02 15:04:05.000"))
 	value, err := nn.childPromises[childIndex].Get(ctx)
-	fmt.Fprintf(os.Stdout, "Date end download of thissssss chunkkkkkkk : %s \n", time.Now().Format("2006-01-02 15:04:05.000"))
 	nn.childPromises[childIndex] = nil
 	return value, err
 }
