@@ -131,7 +131,6 @@ func (nn *NavigableIPLDNode) GetIPLDNode() Node {
 func (nn *NavigableIPLDNode) ChildTotal() uint {
 	return uint(len(nn.GetIPLDNode().Links()))
 }
-
 // ExtractIPLDNode is a helper function that takes a `NavigableNode`
 // and returns the IPLD `Node` wrapped inside. Used in the `Visitor`
 // function.
