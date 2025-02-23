@@ -2,9 +2,6 @@ package format
 
 import (
 	"context"
-	"fmt"
-	"os"
-	"time"
 
 	cid "github.com/ipfs/go-cid"
 )
