@@ -57,9 +57,7 @@ func (nn *NavigableIPLDNode) FetchChild(ctx context.Context, childIndex uint) (N
 		}
 	}
 
-	fmt.Fprintf(os.Stdout, "After preloading is launched and before getting the needed chunk : %s \n", time.Now().Format("2006-01-02 15:04:05.000"))
 	child, err := nn.getPromiseValue(ctx, childIndex)
-	fmt.Fprintf(os.Stdout, "After preloading is launched and afterrr getting the needed chunk : %s \n", time.Now().Format("2006-01-02 15:04:05.000"))
 
 	switch err {
 	case nil:
@@ -96,7 +94,6 @@ func (nn *NavigableIPLDNode) preload(ctx context.Context, beg uint) {
 	if end >= uint(len(nn.childCIDs)) {
 		end = uint(len(nn.childCIDs))
 	}
-	fmt.Fprintf(os.Stdout, "Launching preloadddddd of the ipld node :%s %s \n", nn.node.String(), time.Now().Format("2006-01-02 15:04:05.000"))
 
 	copy(nn.childPromises[beg:], GetNodes(ctx, nn.nodeGetter, nn.childCIDs[beg:end]))
 }
