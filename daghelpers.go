@@ -82,7 +82,7 @@ func GetNodes(ctx context.Context, ds NodeGetter, keys []cid.Cid) []*NodePromise
 					if c.Equals(lnk_c) {
 						count++
 						fmt.Fprintf(os.Stdout, "preloadedddddd chunk of index : %d : %s \n", i, time.Now().Format("2006-01-02 15:04:05.000"))
-						//promises[i].Send(nd)
+						promises[i].Send(nd)
 					}
 				}
 			case <-ctx.Done():
