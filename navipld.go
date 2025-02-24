@@ -10,7 +10,7 @@ import (
 )
 
 // NavigableIPLDNode implements the `NavigableNode` interface wrapping
-// an IPLD `Node` and providing support for node promises.
+// an IPLD `Node` and providing support for node promises
 type NavigableIPLDNode struct {
 	node Node
 
