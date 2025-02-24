@@ -50,9 +50,7 @@ func (nn *NavigableIPLDNode) FetchChildEC(ctx context.Context, childIndex uint) 
 	if nn.childPromises[childIndex] == nil {
 		nn.preload(ctx, childIndex)
 	}
-	fmt.Fprintf(os.Stdout, "After preloading is launched and before getting the needed chunk : %s \n", time.Now().Format("2006-01-02 15:04:05.000"))
 	child, err := nn.getPromiseValue(ctx, childIndex)
-	fmt.Fprintf(os.Stdout, "After preloading is launched and afterrr getting the needed chunk : %s \n", time.Now().Format("2006-01-02 15:04:05.000"))
 	switch err {
 	case nil:
 	case context.DeadlineExceeded, context.Canceled:
@@ -88,9 +86,7 @@ func (nn *NavigableIPLDNode) FetchChild(ctx context.Context, childIndex uint) (N
 			break
 		}
 	}
-	fmt.Fprintf(os.Stdout, "After preloading is launched and before getting the needed chunk : %s \n", time.Now().Format("2006-01-02 15:04:05.000"))
 	child, err := nn.getPromiseValue(ctx, childIndex)
-	fmt.Fprintf(os.Stdout, "After preloading is launched and afterrr getting the needed chunk : %s \n", time.Now().Format("2006-01-02 15:04:05.000"))
 	switch err {
 	case nil:
 	case context.DeadlineExceeded, context.Canceled:
