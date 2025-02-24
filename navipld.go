@@ -7,7 +7,7 @@ import (
 )
 
 // NavigableIPLDNode implements the `NavigableNode` interface wrapping
-// an IPLD `Node` and providing support for node promises
+// an IPLD `Node` and providing support for node promises.
 type NavigableIPLDNode struct {
 	node Node
 
@@ -41,36 +41,6 @@ func NewNavigableIPLDNode(node Node, nodeGetter NodeGetter) *NavigableIPLDNode {
 // FetchChild implements the `NavigableNode` interface using node promises
 // to preload the following child nodes to `childIndex` leaving them ready
 // for subsequent `FetchChild` calls.
-func (nn *NavigableIPLDNode) FetchChildEC(ctx context.Context, childIndex uint) (NavigableNode, error) {
-	// This function doesn't check that `childIndex` is valid, that's
-	// the `Walker` responsibility.
-	if nn.childPromises[childIndex] == nil {
-		nn.preload(ctx, childIndex)
-	}
-	child, err := nn.getPromiseValue(ctx, childIndex)
-	switch err {
-	case nil:
-	case context.DeadlineExceeded, context.Canceled:
-		if ctx.Err() != nil {
-			return nil, ctx.Err()
-		}
-
-		// In this case, the context used to *preload* the node (in a previous
-		// `FetchChild` call) has been canceled. We need to retry the load with
-		// the current context and we might as well preload some extra nodes
-		// while we're at it.
-		nn.preload(ctx, childIndex)
-		child, err = nn.getPromiseValue(ctx, childIndex)
-		if err != nil {
-			return nil, err
-		}
-	default:
-		return nil, err
-	}
-
-	return NewNavigableIPLDNode(child, nn.nodeGetter), nil
-}
-
 func (nn *NavigableIPLDNode) FetchChild(ctx context.Context, childIndex uint) (NavigableNode, error) {
 	// This function doesn't check that `childIndex` is valid, that's
 	// the `Walker` responsibility.
@@ -83,7 +53,9 @@ func (nn *NavigableIPLDNode) FetchChild(ctx context.Context, childIndex uint) (N
 			break
 		}
 	}
+
 	child, err := nn.getPromiseValue(ctx, childIndex)
+
 	switch err {
 	case nil:
 	case context.DeadlineExceeded, context.Canceled:
@@ -110,7 +82,7 @@ func (nn *NavigableIPLDNode) FetchChild(ctx context.Context, childIndex uint) (N
 // Number of nodes to preload every time a child is requested.
 // TODO: Give more visibility to this constant, it could be an attribute
 // set in the `Walker` context that gets passed in `FetchChild`.
-const preloadSize = 6
+const preloadSize = 10
 
 // Preload at most `preloadSize` child nodes from `beg` through promises
 // created using this `ctx`.
@@ -119,6 +91,7 @@ func (nn *NavigableIPLDNode) preload(ctx context.Context, beg uint) {
 	if end >= uint(len(nn.childCIDs)) {
 		end = uint(len(nn.childCIDs))
 	}
+
 	copy(nn.childPromises[beg:], GetNodes(ctx, nn.nodeGetter, nn.childCIDs[beg:end]))
 }
 
