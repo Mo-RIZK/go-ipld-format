@@ -126,7 +126,6 @@ func (nn *NavigableIPLDNode) preload(ctx context.Context, beg uint) {
 	if end >= uint(len(nn.childCIDs)) {
 		end = uint(len(nn.childCIDs))
 	}
-	fmt.Fprintf(os.Stdout, "Launching preloadddddd of the ipld node :%s %s \n", nn.node.String(), time.Now().Format("2006-01-02 15:04:05.000"))
 	copy(nn.childPromises[beg:], GetNodes(ctx, nn.nodeGetter, nn.childCIDs[beg:end]))
 }
 
