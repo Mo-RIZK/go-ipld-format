@@ -112,7 +112,7 @@ type NavigableNode interface {
 	// configuration attributes stored by the user before initiating the
 	// walk operation.
 	FetchChild(ctx context.Context, childIndex uint) (NavigableNode, error)
-	FetchChildEC(ctx context.Context, childIndex uint) (NavigableNode, error)
+
 	// ChildTotal returns the number of children of the `ActiveNode`.
 	ChildTotal() uint
 
@@ -241,7 +241,7 @@ func (w *Walker) Iterate(visitor Visitor) error {
 	}
 }
 
-func (w *Walker) ECIterate(visitor Visitor) error {
+func (w *Walker) ECIterate(visitor Visitor,chunksize uint64) error {
 
 	// Iterate until either: the end of the DAG (`errUpOnRoot`), a `Pause`
 	// is requested (`errPauseWalkOperation`) or an error happens (while
@@ -250,7 +250,7 @@ func (w *Walker) ECIterate(visitor Visitor) error {
 
 		// First, go down as much as possible.
 		for {
-			err := w.ECdown(visitor)
+			err := w.ECdown(visitor,chunksize)
 
 			if err == ErrDownNoChild {
 				break
@@ -273,18 +273,18 @@ func (w *Walker) ECIterate(visitor Visitor) error {
 		// to go down a different path. If there are no more child nodes
 		// available, go back up.
 		for {
-			err := w.NextChildEC()
+			err := w.up()
+			if err != nil {
+				// Can't move up, on the root again (`errUpOnRoot`).
+				return EndOfDag
+			}
+			err = w.NextChild()
 			if err == nil {
 				break
 				// No error, it turned to the next child. Try to go down again.
 			}
 
 			// It can't go Next (`ErrNextNoChild`), try to move up.
-			err = w.up()
-			if err != nil {
-				// Can't move up, on the root again (`errUpOnRoot`).
-				return EndOfDag
-			}
 
 			// Moved up, try `NextChild` again.
 		}
@@ -364,18 +364,7 @@ func (w *Walker) down(visitor Visitor) error {
 	return w.visitActiveNode(visitor)
 }
 
-func (w *Walker) ECdown(visitor Visitor) error {
-	child, err := w.fetchChildEC()
-	if err != nil {
-		return err
-	}
-
-	w.extendPath(child)
-
-	return w.visitActiveNode(visitor)
-}
-
-/*func (w *Walker) ECdown(visitor Visitor, chunksize uint64) error {
+func (w *Walker) ECdown(visitor Visitor,chunksize uint64) error {
 
 	if w.currentDepth == -1 {
 		// First time `down()` is called, `currentDepth` is -1,
@@ -384,6 +373,7 @@ func (w *Walker) ECdown(visitor Visitor) error {
 		// and `ActiveChildIndex` is of no use yet).
 		w.extendPath(w.path[0])
 	}
+
 	if w.ActiveNode().GetIPLDNode().Links()[0].Size > chunksize*2 {
 		child, err := w.fetchChild()
 		if err != nil {
@@ -395,7 +385,7 @@ func (w *Walker) ECdown(visitor Visitor) error {
 		w.visitActiveNode(visitor)
 		return ErrDownNoChild
 	}
-}*/
+}
 
 // Fetch the child from the `ActiveNode` through the `FetchChild`
 // method of the `NavigableNode` interface.
@@ -414,28 +404,6 @@ func (w *Walker) fetchChild() (NavigableNode, error) {
 	}
 
 	return w.ActiveNode().FetchChild(w.ctx, w.ActiveChildIndex())
-
-	// TODO: Maybe call `extendPath` here and hide it away
-	// from `down`.
-}
-
-// Fetch the child from the `ActiveNode` through the `FetchChild`
-// method of the `NavigableNode` interface.
-func (w *Walker) fetchChildEC() (NavigableNode, error) {
-	if w.currentDepth == -1 {
-		// First time `down()` is called, `currentDepth` is -1,
-		// return the root node. Don't check available child nodes
-		// (as the `Walker` is not actually on any node just yet
-		// and `ActiveChildIndex` is of no use yet).
-		return w.path[0], nil
-	}
-
-	// Check if the child to fetch exists.
-	if w.ActiveChildIndex() >= w.ActiveNode().ChildTotal() {
-		return nil, ErrDownNoChild
-	}
-
-	return w.ActiveNode().FetchChildEC(w.ctx, w.ActiveChildIndex())
 
 	// TODO: Maybe call `extendPath` here and hide it away
 	// from `down`.
@@ -519,30 +487,11 @@ func (w *Walker) NextChild() error {
 	return nil
 }
 
-func (w *Walker) NextChildEC() error {
-	w.incrementActiveChildIndexEC()
-
-	if w.ActiveChildIndex() == w.ActiveNode().ChildTotal() {
-		return ErrNextNoChild
-		// At the end of the available children, signal it.
-	}
-
-	return nil
-}
-
 // incrementActiveChildIndex increments the child index of the `ActiveNode` to
 // point to the next child (if it exists) or to the position past all of
 // the child nodes (`ChildTotal`) to signal that all of its children have
 // been visited/skipped (if already at that last position, do nothing).
 func (w *Walker) incrementActiveChildIndex() {
-	if w.ActiveChildIndex()+1 <= w.ActiveNode().ChildTotal() {
-		w.childIndex[w.currentDepth]++
-	}
-}
-func (w *Walker) incrementActiveChildIndexEC() {
-	if w.ActiveChildIndex() == 6 {
-		w.childIndex[w.currentDepth] += 1
-	}
 	if w.ActiveChildIndex()+1 <= w.ActiveNode().ChildTotal() {
 		w.childIndex[w.currentDepth]++
 	}
