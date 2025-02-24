@@ -241,7 +241,7 @@ func (w *Walker) Iterate(visitor Visitor) error {
 	}
 }
 
-func (w *Walker) ECIterate(visitor Visitor, chunksize uint64) error {
+func (w *Walker) ECIterate(visitor Visitor) error {
 
 	// Iterate until either: the end of the DAG (`errUpOnRoot`), a `Pause`
 	// is requested (`errPauseWalkOperation`) or an error happens (while
