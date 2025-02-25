@@ -77,7 +77,10 @@ func GetNodes(ctx context.Context, ds NodeGetter, keys []cid.Cid) []*NodePromise
 				}
 
 				nd := opt.Node
+				stt := time.Now()
 				c := nd.Cid()
+				enn := time.Since(stt)
+				fmt.Fprintf(os.Stdout, "Timmmmeeeee takennnnn to calculate the cidddd of the node of cid : %s, is %s \n",c,enn.String())
 				for i, lnk_c := range keys {
 					if c.Equals(lnk_c) {
 						count++
