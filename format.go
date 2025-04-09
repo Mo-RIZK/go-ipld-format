@@ -61,18 +61,17 @@ type Link struct {
 // NodeStat is a statistics object for a Node. Mostly sizes.
 type NodeStat struct {
 	Hash           string
-	NumLinks       int // number of links in link table
-	BlockSize      int // size of the raw, encoded data
-	LinksSize      int // size of the links segment
-	DataSize       int // size of the data segment
-	CumulativeSize int // cumulative size of object and its references
+	NumLinks       int  // number of links in link table
+	BlockSize      int  // size of the raw, encoded data
+	LinksSize      int  // size of the links segment
+	DataSize       int  // size of the data segment
+	CumulativeSize int  // cumulative size of object and its references
 }
 
 func (ns NodeStat) String() string {
 	f := "NodeStat{NumLinks: %d, BlockSize: %d, LinksSize: %d, DataSize: %d, CumulativeSize: %d}"
 	return fmt.Sprintf(f, ns.NumLinks, ns.BlockSize, ns.LinksSize, ns.DataSize, ns.CumulativeSize)
 }
-
 
 // MakeLink creates a link to the given node
 func MakeLink(n Node) (*Link, error) {
@@ -90,7 +89,7 @@ func MakeLink(n Node) (*Link, error) {
 	}
 	en = time.Since(st)
 	fmt.Fprintf(os.Stdout, "GGGGGGGGGGGHHHHHHHHHHHHHHHHHHHHHH2222222222222222222222222 : %s \n", en.String())
-	return l,nil
+	return l, nil
 }
 
 // GetNode returns the MDAG Node that this link points to
