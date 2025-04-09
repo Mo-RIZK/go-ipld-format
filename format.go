@@ -66,6 +66,9 @@ type NodeStat struct {
 	LinksSize      int // size of the links segment
 	DataSize       int // size of the data segment
 	CumulativeSize int // cumulative size of object and its references
+	EC             bool // If we are using Erasure coding
+	Or             int  // original of EC
+	Par            int  // parity of EC
 }
 
 func (ns NodeStat) String() string {
