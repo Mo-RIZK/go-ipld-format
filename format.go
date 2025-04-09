@@ -76,6 +76,13 @@ func (ns NodeStat) String() string {
 	return fmt.Sprintf(f, ns.NumLinks, ns.BlockSize, ns.LinksSize, ns.DataSize, ns.CumulativeSize)
 }
 
+func (ns NodeStat) USEEC() bool {
+	return ns.EC
+}
+func (ns NodeStat) ECPAR() (int,int) {
+	return ns.Or, ns.Par
+}
+
 // MakeLink creates a link to the given node
 func MakeLink(n Node) (*Link, error) {
 	st := time.Now()
