@@ -66,9 +66,6 @@ type NodeStat struct {
 	LinksSize      int // size of the links segment
 	DataSize       int // size of the data segment
 	CumulativeSize int // cumulative size of object and its references
-	EC             bool // If we are using Erasure coding
-	Or             int  // original of EC
-	Par            int  // parity of EC
 }
 
 func (ns NodeStat) String() string {
@@ -76,12 +73,6 @@ func (ns NodeStat) String() string {
 	return fmt.Sprintf(f, ns.NumLinks, ns.BlockSize, ns.LinksSize, ns.DataSize, ns.CumulativeSize)
 }
 
-func (ns NodeStat) USEEC() bool {
-	return ns.EC
-}
-func (ns NodeStat) ECPAR() (int,int) {
-	return ns.Or, ns.Par
-}
 
 // MakeLink creates a link to the given node
 func MakeLink(n Node) (*Link, error) {
