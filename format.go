@@ -44,8 +44,6 @@ type Node interface {
 
 	// Size returns the size in bytes of the serialized object
 	Size() (uint64, error)
-
-	EC() (int,int)
 }
 
 // Link represents an IPFS Merkle DAG Link between Nodes.
