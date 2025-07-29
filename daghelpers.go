@@ -57,6 +57,7 @@ func GetNodes(ctx context.Context, ds NodeGetter, keys []cid.Cid) []*NodePromise
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
+		stt1 := time.Now()
 		nodechan := ds.GetMany(ctx, dedupedKeys)
 
 		for count := 0; count < len(keys); {
@@ -75,7 +76,8 @@ func GetNodes(ctx context.Context, ds NodeGetter, keys []cid.Cid) []*NodePromise
 					}
 					return
 				}
-
+				enn1 : time.Since(stt1)
+				fmt.Fprintf(os.Stdout, "Timmmmeeeee takennnnn to Retrieve a chunk is : %s \n",enn1.String())
 				nd := opt.Node
 				stt := time.Now()
 				c := nd.Cid()
