@@ -2,9 +2,6 @@ package format
 
 import (
 	"context"
-	"fmt"
-	"os"
-	"time"
 
 	blocks "github.com/ipfs/go-block-format"
 
