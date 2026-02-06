@@ -3,6 +3,7 @@ package format
 import (
 	"context"
 
+	"fmt"
 	blocks "github.com/ipfs/go-block-format"
 
 	cid "github.com/ipfs/go-cid"
